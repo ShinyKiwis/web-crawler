@@ -1,28 +1,3 @@
-<?php 
-$url = '';
-$message = '';
-$is_crawling = FALSE;
-
-if ($_SERVER["REQUEST_METHOD"] == "POST"){
-  if (isset($_POST["start_crawl"])){
-    $url = $_POST["url"];
-    if($url != ''){
-      $is_crawling = TRUE;
-      $message = "Crawling at ". $url;
-      // Call function crawl here 
-    }
-  }elseif (isset($_POST["stop_crawl"])){
-    if($is_crawling) {
-      $message = "Stopped crawling";
-      $is_crawling = FALSE;
-      // Call function to stop crawl here
-    }
-  }elseif (isset($_POST["download"])){
-    // Call function to start download here
-  }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,10 +10,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 <body>
   <div class="container">
     <h1>Simple Web Crawler</h1>
-    <form action="index.php" method="POST" class="container_wrapper" id="input_form">
+    <form  method="POST" class="container_wrapper" id="input_form">
       <div class="container_input">
         <input name="url" id="url" type="text" placeholder="Enter a url you want to crawl" value=""/>
-        <select>
+        <select name="type" id="type">
           <option>Choose file format</option>
           <option disabled>---Image Extensions---</option>
           <option>jpg</option>
@@ -50,12 +25,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         </select>
       </div>
       <div class="container_operation">
-        <input type="submit" name="start_crawl" value="Start to crawl"/>
-        <input type="submit" name="stop_crawl" value="Stop crawling"/>
+        <input type="submit" name="start" id="start" value="Start to crawl"/>
+        <input type="submit" name="stop" id="stop" value="Stop crawling"/>
+        <input type="hidden" name="action" id="action" value="" />
       </div>
     </form>
     <div class="container_result">
-      <h2><?= $message?></h2>
+      <h2 id="message"></h2>
       <h2>Result: </h2>
       <div class="result_box">
 
@@ -67,20 +43,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
   </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script type="text/javascript" >
-    $(document).ready(function() {
-      $("form").on("submit", function(event) {
-        // $.ajax({
-        //   type: "POST",
-        //   url: "index.php",
-        //   data: $(this).serialize,
-        //   succes: function {
-        //     console.log("YAY")
-        //   }
-        // })
-        event.preventDefault()
-      })
+    // Handle action 
+    // 1. start to crawl
+    // 2. stop crawling
+    // 3. download all
+    $('#start').click(function (){
+      $('#action').val('1');
+    })
+    $('#stop').click(function (){
+      $('#action').val('2');
     })
 
+    // Handle form submit
+    $('#input_form').on('submit', function(e) {
+      e.preventDefault();
+      $.ajax({
+        type:'post',
+        url: 'server.php',
+        data: $('#input_form').serialize(),
+        success: function (response) {
+          data = JSON.parse(JSON.stringify(response))
+          alert(data)
+          if("message" in data){
+            message = data.message 
+            document.getElementById('message').textContent = message
+          }else{
+            message = `Crawling ${data.type} files at link: ${data.url}`
+            document.getElementById('message').textContent = message
+          }
+        },
+        error: function() {
+          alert('ERROR!')
+        }
+      })
+      // alert($('#input_form').serialize())
+    })
   </script>
 </body>
 </html>
