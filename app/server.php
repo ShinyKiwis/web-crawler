@@ -14,8 +14,12 @@ if(isset($_POST['action'])){
         $output = array(
             'url' => $url,
             'type' => $type,
+            'status' => $url == "https://books.toscrape.com/"
         );
         // Start crawling here
+        if($url == "https://books.toscrape.com/") {
+            $output['data'] = get_data();
+        }
     } else if($_POST['action'] == '2'){
         $output = array (
             'message' => 'Stopped Crawling'

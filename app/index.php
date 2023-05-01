@@ -34,10 +34,10 @@
       <h2 id="message"></h2>
       <h2>Result: </h2>
       <div class="result_box">
-
       </div>
-      <form action="index.php" class="result_buttons" method="POST">
+      <form action="index.php" class="result_buttons" method="POST" id="download_form">
         <input type="submit" name="download" value="Download as zip" />
+        <input type="hidden" name="download" value="1" />
       </form>
     </div>
   </div>
@@ -53,7 +53,24 @@
     $('#stop').click(function (){
       $('#action').val('2');
     })
+    // Handle download 
+    $('#download_form').on('submit', function(e) {
+      e.preventDefault();
+      $.ajax({
+        type: 'post',
+        url: 'download.php',
+        data: $('#download_form').serialize(),
+        success: function (response) {
+          // alert($('#download_form').serialize())
+          response_data = JSON.parse(JSON.stringify(response))
+          alert(response_data)
+        },
+        error: function () {
 
+        }
+      })
+    })
+    
     // Handle form submit
     $('#input_form').on('submit', function(e) {
       e.preventDefault();
@@ -62,13 +79,39 @@
         url: 'server.php',
         data: $('#input_form').serialize(),
         success: function (response) {
-          data = JSON.parse(response.trim())
-          if("message" in data){
-            message = data.message 
+          response_data = JSON.parse(response.trim())
+          // This is for debugging
+          // response_data = JSON.parse(JSON.stringify(response.trim()))
+          // alert(response_data)
+          if(response_data.hasOwnProperty('message')){
+            message = response_data.message 
             document.getElementById('message').textContent = message
           }else{
-            message = `Crawling ${data.type} files at link: ${data.url}`
+            message = `Crawling ${response_data.type} files at link: ${response_data.url}`
             document.getElementById('message').textContent = message
+            result_box = document.getElementsByClassName('result_box')[0]
+            // Output for users
+            response_data.data.forEach(data => {
+              const link = document.createElement("a")
+              link.textContent = data
+              result_box.appendChild(link)
+              result_box.appendChild(document.createElement("br"))
+            }) 
+
+            // Save data to download later
+            $.ajax({
+              type:'post',
+              url: 'download.php',
+              data: {download_list: response_data.data},
+              success: function(response) {
+                // alert(response_data.data)
+                response_data = JSON.parse(JSON.stringify(response))
+                alert(`AFTER CRAWLED: ${response_data}`)
+              },
+              error: function (){
+                alert('ERROR WHILE PROCESSING FOR DOWNLOAD!')
+              }
+            })
           }
         },
         error: function() {
