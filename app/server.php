@@ -1,6 +1,6 @@
 
 <?php 
-require 'vendor/audoload.php';
+require 'vendor/autoload.php';
 require_once 'nav-img-crawler.php';
 
 $output = array (

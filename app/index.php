@@ -62,8 +62,7 @@
         url: 'server.php',
         data: $('#input_form').serialize(),
         success: function (response) {
-          data = JSON.parse(JSON.stringify(response))
-          alert(data)
+          data = JSON.parse(response.trim())
           if("message" in data){
             message = data.message 
             document.getElementById('message').textContent = message
