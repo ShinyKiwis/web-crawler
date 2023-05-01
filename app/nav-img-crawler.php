@@ -8,7 +8,7 @@ function get_data() {
     
     // Although the code below allows you to crawl all the pages
     // I will limited at only 5 pages for presentation purposes
-    $depth = 5;
+    $depth = 1;
     $extracted_thumbnails = [];
     do{
         $html_string = (string)$response->getBody();
