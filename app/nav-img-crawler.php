@@ -12,6 +12,7 @@ function get_data() {
     $extracted_thumbnails = [];
     do{
         $html_string = (string)$response->getBody();
+        
         libxml_use_internal_errors(true);
         $doc = new DOMDocument();
         $doc->loadHTML($html_string);

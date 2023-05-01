@@ -86,7 +86,7 @@
           if(response_data.hasOwnProperty('message')){
             message = response_data.message 
             document.getElementById('message').textContent = message
-          }else{
+          } else {
             message = `Crawling ${response_data.type} files at link: ${response_data.url}`
             document.getElementById('message').textContent = message
             result_box = document.getElementsByClassName('result_box')[0]
