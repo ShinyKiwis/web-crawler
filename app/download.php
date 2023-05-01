@@ -5,23 +5,23 @@ if(isset($_POST['download_list'])) {
     $_SESSION['download_list'] = $_POST['download_list'];
     $result = $_SESSION['download_list'];
 }else if($_POST['download'] == '1' and !empty($_SESSION['download_list'])) {
-    $zipname = 'resources.zip';
     $zip = new ZipArchive();
-    $zip->open($zipname, ZipArchive::CREATE);
-
+    $tmp_file = tempnam('/tmp', 'data.zip');
+    $zip->open($tmp_file, ZipArchive::OVERWRITE);
     foreach ($_SESSION['download_list'] as $url) {
-    $filename = basename($url);
-    $content = file_get_contents($url);
-    $zip->addFromString($filename, $content);
+        $filename = basename($url);
+        $content = file_get_contents($url);
+        $zip->addFromString($filename, $content);
     }
-
+    
     $zip->close();
+    $result = $tmp_file;
 
-    header('Content-Type: application/zip');
-    header('Content-disposition: attachment; filename='.$zipname);
-    header('Content-Length: ' . filesize($zipname));
-    readfile($zipname);
-    $result = 'downloading';
+    header('Content-disposition: attachment; filename="data.zip"');
+    header('Content-type: application/zip');
+    header('Content-Length: ' . filesize($tmp_file));
+    readfile($tmp_file);
+    unlink($tmp_file);
 }
-echo json_encode(array('data' => $result))
+echo json_encode(array('data' => $result));
 ?>
