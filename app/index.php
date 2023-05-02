@@ -66,18 +66,19 @@
             alert(response_data)
           }else {
             console.log(response)
-            const blob = new Blob([response], { type: "application/zip" });
-            // Create a temporary link to the Blob
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.download = 'data.zip';
+            console.log(typeof(response))
+            // const blob = new Blob([response], { type: "application/zip" });
+            // // Create a temporary link to the Blob
+            // const link = document.createElement('a');
+            // link.href = window.URL.createObjectURL(blob);
+            // link.download = 'data.zip';
             
-            // Add the link to the DOM and simulate a click
-            document.body.appendChild(link);
-            link.click();
+            // // Add the link to the DOM and simulate a click
+            // document.body.appendChild(link);
+            // link.click();
             
-            // Remove the link from the DOM
-            document.body.removeChild(link);
+            // // Remove the link from the DOM
+            // document.body.removeChild(link);
           }
         },
         error: function () {

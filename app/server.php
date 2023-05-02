@@ -19,6 +19,8 @@ if(isset($_POST['action'])){
         // Start crawling here
         if($url == "https://books.toscrape.com/") {
             $output['data'] = get_data();
+        }else if ($url == ""){
+            $output['data'] = getUnsplashData();
         }
     } else if($_POST['action'] == '2'){
         $output = array (
