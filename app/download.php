@@ -7,36 +7,32 @@ if(isset($_POST['download_list'])) {
     echo json_encode(array('data' => $result));
 }else if($_POST['download'] == '1' and !empty($_SESSION['download_list'])) {
     $zip = new ZipArchive();
-    $tmp_file = tempnam('/tmp', 'data.zip');
-    $zip->open($tmp_file, ZipArchive::OVERWRITE);
-    foreach ($_SESSION['download_list'] as $url) {
-        $filename = basename($url);
-        $content = file_get_contents($url);
-        $zip->addFromString($filename, $content);
-    }
-    
-    $zip->close();
-    $result = $tmp_file;
 
-    // header('Content-Disposition: attachment; filename="data.zip"');
-    // header('Content-Type: application/zip');
-    // // header('Content-Length: ' . filesize($tmp_file));
-    // // header('Access-Control-Allow-Origin: *');
-    // // header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-    // // header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
-    // header('Content-Transfer-Encoding: binary');
-    // header('Pragma: public');
-    // header('Content-Description: File Transfer');
-    // readfile($tmp_file);
-    // unlink($tmp_file);
-    header('Content-Description: File Transfer');
-    header('Content-Type: application/octet-stream');
-    header('Content-Disposition: attachment; filename="'.basename($tmp_file).'"');
-    header('Expires: 0');
-    header('Cache-Control: must-revalidate');
-    header('Pragma: public');
+    // Create a temporary file to store the zip data
+    $tmp_file = tempnam(sys_get_temp_dir(), 'zip');
+
+    // Open the temporary file for writing
+    $zip->open($tmp_file, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+    // Add each URL as a new file in the zip archive
+    foreach ($_SESSION['download_list'] as $url) {
+      $contents = file_get_contents($url);
+      $filename = basename($url);
+      $zip->addFromString($filename, $contents);
+    }
+
+    // Close the zip archive
+    $zip->close();
+
+    // Set the appropriate headers for downloading the zip file
+    header('Content-Type: application/zip');
+    header('Content-Disposition: attachment; filename="files.zip"');
     header('Content-Length: ' . filesize($tmp_file));
+
+    // Output the contents of the temporary file
     readfile($tmp_file);
-    exit;
+
+    // Delete the temporary file
+    unlink($tmp_file);
 }
 ?>
