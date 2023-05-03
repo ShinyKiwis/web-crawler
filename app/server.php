@@ -16,11 +16,14 @@ if(isset($_POST['action'])){
             'type' => $type,
             'status' => $url == "https://books.toscrape.com/"
         );
+        $unsplash_url = "/https:\/\/unsplash.com\/s\/photos\//i";
         // Start crawling here
         if($url == "https://books.toscrape.com/") {
             $output['data'] = get_data();
-        }else if ($url == ""){
-            $output['data'] = getUnsplashData();
+        }else if (preg_match($unsplash_url, $url)) {
+            ob_start();
+            $output['data'] = getUnsplashData(preg_replace($unsplash_url, "", $url));
+            ob_end_clean();
         }
     } else if($_POST['action'] == '2'){
         $output = array (
