@@ -60,25 +60,18 @@
         type: 'post',
         url: 'download.php',
         data: $('#download_form').serialize(),
+        xhrFields: {
+          responseType: 'blob'
+        },
         success: function (response) {
-          if(typeof response == 'object'){
-            response_data = JSON.parse(response)
-            alert(response_data)
-          }else {
-            console.log(response)
-            const blob = new Blob([response], { type: "application/zip" });
-            // Create a temporary link to the Blob
-            const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.download = 'data.zip';
-            
-            // Add the link to the DOM and simulate a click
-            document.body.appendChild(link);
-            link.click();
-            
-            // Remove the link from the DOM
-            document.body.removeChild(link);
-          }
+          var url = window.URL.createObjectURL(response);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = 'files.zip';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
         },
         error: function () {
 
