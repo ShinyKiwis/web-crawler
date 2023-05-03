@@ -3,6 +3,7 @@
 
 require 'vendor/autoload.php';
 require_once 'nav-img-crawler.php';
+require_once 'unsplash-crawler.php';
 
 $output = array (
     'message' => 'ERROR'
