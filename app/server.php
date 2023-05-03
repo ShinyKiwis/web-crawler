@@ -5,6 +5,7 @@ require 'vendor/autoload.php';
 require_once 'nav-img-crawler.php';
 require_once 'unsplash-crawler.php';
 require_once 'anna-crawler.php';
+require_once 'pdfdrive-crawler.php';
 
 $output = array (
     'message' => 'ERROR',
@@ -34,7 +35,7 @@ if(isset($_POST['action'])){
         }else {
             // Pdfdrive here
             // Write a function and return array of urls
-            $output['data'] = '';
+            $output['data'] = get_pdf();
         }
     } else if($_POST['action'] == '2'){
         $output = array (
