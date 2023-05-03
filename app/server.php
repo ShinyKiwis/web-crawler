@@ -4,9 +4,10 @@
 require 'vendor/autoload.php';
 require_once 'nav-img-crawler.php';
 require_once 'unsplash-crawler.php';
+require_once 'anna-crawler.php';
 
 $output = array (
-    'message' => 'ERROR'
+    'message' => 'ERROR',
 );
 
 if(isset($_POST['action'])){
@@ -16,9 +17,10 @@ if(isset($_POST['action'])){
         $output = array(
             'url' => $url,
             'type' => $type,
-            'status' => $url == "https://books.toscrape.com/"
         );
         $unsplash_url = "/https:\/\/unsplash.com\/s\/photos\//i";
+        $anna_url = "/https:\/\/annas-archive.org\/search\?/i";
+        $output['status'] = preg_match($anna_url, $url);
         // Start crawling here
         if($url == "https://books.toscrape.com/") {
             $output['data'] = get_data();
@@ -26,6 +28,13 @@ if(isset($_POST['action'])){
             ob_start();
             $output['data'] = getUnsplashData(preg_replace($unsplash_url, "", $url));
             ob_end_clean();
+        }else if(preg_match($anna_url, $url)) {
+            // $output['status-keyword'] =preg_replace($anna_url,"",$url);
+            $output['data'] = getAnnaData(preg_replace($anna_url,"",$url),$type);
+        }else {
+            // Pdfdrive here
+            // Write a function and return array of urls
+            $output['data'] = '';
         }
     } else if($_POST['action'] == '2'){
         $output = array (

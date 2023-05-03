@@ -21,7 +21,7 @@
           <option>jpeg</option>
           <option disabled>---File Extensions---</option>
           <option>pdf</option>
-          <option>mp3</option>
+          <option>epub</option>
         </select>
       </div>
       <div class="container_operation">
@@ -85,78 +85,53 @@
     // Handle form submit
     $('#input_form').on('submit', function(e) {
       e.preventDefault();
+      $.ajax({
+        type:'post',
+        url: 'server.php',
+        data: $('#input_form').serialize(),
+        success: function (response) {
+          alert($('#input_form').serialize())
+          response_data = JSON.parse(response.trim())
+          // This is for debugging
+          // response_data = JSON.parse(JSON.stringify(response.trim()))
+          // alert(response_data)
+          if(response_data.hasOwnProperty('message')){
+            message = response_data.message 
+            document.getElementById('message').textContent = message
+          } else {
+            message = `Crawling ${response_data.type} files at link: ${response_data.url}`
+            document.getElementById('message').textContent = message
+            result_box = document.getElementsByClassName('result_box')[0]
+            // Output for users
+            response_data.data.forEach(data => {
+              const link = document.createElement("a")
+              link.textContent = data
+              link.href = data 
+              link.target = "_blank"
+              result_box.appendChild(link)
+              result_box.appendChild(document.createElement("br"))
+            }) 
 
-      const selector = document.getElementById("type")
-      switch (selector.value) {
-        case "pdf": {
-          // pdf crawler
-          fetch("pdfdrive-crawler.php")
-          .then(resp => resp.text())
-          .then(data => {
-            const resultBox = document.querySelector(".result_box")
-            resultBox.innerHTML = data
-
-            const downloadButton = document.createElement("button")
-            downloadButton.id = "pdf-download-btn"
-            downloadButton.textContent = "Download PDFs"
-            downloadButton.onclick = () => {
-              const pdfURLs = document.querySelectorAll(".pdf_download")
-              pdfURLs.forEach(pdf => pdf.click())
-            } 
-            const buttonWrapper = document.getElementById("button-wrapper")
-            buttonWrapper.appendChild(downloadButton)
-          })
-          break
-        }
-
-        default: {
-          // book crawler
-          $.ajax({
-            type:'post',
-            url: 'server.php',
-            data: $('#input_form').serialize(),
-            success: function (response) {
-              response_data = JSON.parse(response.trim())
-              // This is for debugging
-              // response_data = JSON.parse(JSON.stringify(response.trim()))
-              // alert(response_data)
-              if(response_data.hasOwnProperty('message')){
-                message = response_data.message 
-                document.getElementById('message').textContent = message
-              } else {
-                message = `Crawling ${response_data.type} files at link: ${response_data.url}`
-                document.getElementById('message').textContent = message
-                result_box = document.getElementsByClassName('result_box')[0]
-                // Output for users
-                response_data.data.forEach(data => {
-                  const link = document.createElement("a")
-                  link.textContent = data
-                  result_box.appendChild(link)
-                  result_box.appendChild(document.createElement("br"))
-                }) 
-
-                // Save data to download later
-                $.ajax({
-                  type:'post',
-                  url: 'download.php',
-                  data: {download_list: response_data.data},
-                  success: function(response) {
-                    alert(response_data.data)
-                    response_data = JSON.parse(JSON.stringify(response))
-                    alert(`AFTER CRAWLED: ${response_data}`)
-                  },
-                  error: function (){
-                    alert('ERROR WHILE PROCESSING FOR DOWNLOAD!')
-                  }
-                })
+            // Save data to download later
+            $.ajax({
+              type:'post',
+              url: 'download.php',
+              data: {download_list: response_data.data},
+              success: function(response) {
+                alert(response_data.data)
+                response_data = JSON.parse(JSON.stringify(response))
+                alert(`AFTER CRAWLED: ${response_data}`)
+              },
+              error: function (){
+                alert('ERROR WHILE PROCESSING FOR DOWNLOAD!')
               }
-            },
-            error: function() {
-              alert('ERROR!')
-            }
-          })
+            })
+          }
+        },
+        error: function() {
+          alert('ERROR!')
         }
-      }
+      })
     })
   </script>
 
